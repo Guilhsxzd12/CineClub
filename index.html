@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CineClub</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header><h1>CineClub</h1></header>
+  <main id="gallery"></main>
+  <footer>
+    <a href="https://t.me/seu_canal" target="_blank">Canal Telegram</a> |
+    <a href="https://link.de/doar" target="_blank">Doar</a> |
+    <a href="https://t.me/canal_reserva" target="_blank">Canal Reserva</a>
+  </footer>
+  <script>
+    fetch('data.json')
+      .then(r => r.json())
+      .then(list => {
+        const gallery = document.getElementById('gallery');
+        list.forEach(f => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <img src="${f.img}" alt="${f.title}" />
+            <h2>${f.title}</h2>
+            <p>${f.desc}</p>
+            <a href="${f.link}" target="_blank">Assistir</a>
+          `;
+          gallery.appendChild(card);
+        });
+      });
+  </script>
+</body>
+</html>
