@@ -1,0 +1,735 @@
+(function () {
+    const banners = [
+        {
+            src: "https://cdn.ereemby.com/attachments/17506018448067054imagem.jpeg",
+            link: "https://cineclubbr.erb.digital/product/175060185060339486975733245"
+        },
+        {
+            src: "https://cdn.ereemby.com/attachments/17506019420085086imagem.jpeg",
+            link: "https://cineclubbr.erb.digital/product/17506019995907928524484023010732"
+        },
+        {
+            src: "https://cdn.ereemby.com/attachments/17506020906564013imagem.png",
+            link: "https://cineclubbr.erb.digital/product/17506021034991636042610643556801"
+        },
+        {
+            src: "https://cdn.ereemby.com/attachments/17506024325041443imagem.jpeg",
+            link: "https://cineclubbr.erb.digital/product/17506024446271391414048463"
+        }
+    ];
+
+    let bannerAtual = 0;
+    const duracaoBanner = 5000;
+    let tempoInicio = Date.now();
+
+    function criarBannerBoaPlay(elemento) {
+        if (elemento.querySelector('.boaplay-hero')) return;
+
+        const bannerDiv = document.createElement('div');
+        bannerDiv.className = 'boaplay-hero';
+        bannerDiv.innerHTML = `
+      <div class="boaplay-hero-left">
+        <h1>Bem Vindo ao <span class="rgb-wave-text">CineClub</span><br> o melhor site para comprar filmes do cinema.</h1>
+        <p>Junte-se ao nosso grupo no Telegram e tenha acesso exclusivo aos lançamentos mais recentes, clássicos imperdíveis e coleções especiais!.</p>
+        <div class="boaplay-buttons">
+          <button class="btn-blue" onclick="window.location.href='/category'">Comprar Filmes</button>
+          <button class="btn-dark" onclick="window.open('http://discord.gg/fQy9hxQsFy', '_blank')">Junte-se a nós</button>
+        </div>
+      </div>
+      <div class="boaplay-hero-image">
+        <a id="boaplay-banner-link" href="#" target="_self">
+          <img id="boaplay-banner-img" src="" alt="Banner BOA PLAY">
+          <div class="progress-bar-container">
+            <div class="progress-bar"></div>
+          </div>
+        </a>
+        <img class="arrow left" src="https://cdn.ereemby.com/attachments/17455288690956185imagem.png" alt="Left Arrow">
+        <img class="arrow right" src="https://cdn.ereemby.com/attachments/17455288697103912imagem.png" alt="Right Arrow">
+      </div>
+    `;
+        elemento.prepend(bannerDiv);
+        atualizarBanner();
+        animarBarraProgresso();
+
+        const heroImage = bannerDiv.querySelector('.boaplay-hero-image');
+        const leftArrow = bannerDiv.querySelector('.arrow.left');
+        const rightArrow = bannerDiv.querySelector('.arrow.right');
+        const progressContainer = bannerDiv.querySelector('.progress-bar-container');
+
+        heroImage.addEventListener('mouseenter', () => {
+            leftArrow.style.opacity = '1';
+            rightArrow.style.opacity = '1';
+            progressContainer.style.opacity = '1';
+        });
+
+        heroImage.addEventListener('mouseleave', () => {
+            leftArrow.style.opacity = '0';
+            rightArrow.style.opacity = '0';
+            progressContainer.style.opacity = '0';
+        });
+
+        leftArrow.addEventListener('click', () => {
+            bannerAtual = (bannerAtual - 1 + banners.length) % banners.length;
+            atualizarBanner();
+            tempoInicio = Date.now();
+        });
+
+        rightArrow.addEventListener('click', () => {
+            bannerAtual = (bannerAtual + 1) % banners.length;
+            atualizarBanner();
+            tempoInicio = Date.now();
+        });
+    }
+
+    function atualizarBanner() {
+        const bannerImg = document.getElementById('boaplay-banner-img');
+        const bannerLink = document.getElementById('boaplay-banner-link');
+        bannerImg.src = banners[bannerAtual].src;
+        bannerLink.href = banners[bannerAtual].link;
+    }
+
+    function animarBarraProgresso() {
+        const progressBar = document.querySelector('.progress-bar');
+
+        function animar() {
+            const tempoDecorrido = Date.now() - tempoInicio;
+            const percentualCompleto = (tempoDecorrido / duracaoBanner) * 100;
+            progressBar.style.width = percentualCompleto + '%';
+
+            if (percentualCompleto >= 100) {
+                bannerAtual = (bannerAtual + 1) % banners.length;
+                atualizarBanner();
+                tempoInicio = Date.now();
+            }
+            requestAnimationFrame(animar);
+        }
+
+        requestAnimationFrame(animar);
+    }
+
+    // Observe element with target classes and create banner when found
+    const targetClass = 'sc-bce61202-0';
+    const targetClassAlt = 'eqzQsx';
+
+    const observer = new MutationObserver(() => {
+        const targetElement = document.querySelector('.' + targetClass + '.' + targetClassAlt);
+        if (targetElement) {
+            criarBannerBoaPlay(targetElement);
+        }
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const targetElement = document.querySelector('.' + targetClass + '.' + targetClassAlt);
+        if (targetElement) {
+            criarBannerBoaPlay(targetElement);
+        }
+    });
+
+
+
+    // Smooth scroll effect for desktop only
+    (function () {
+        const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+        if (isMobile) return;
+
+        let currentScroll = window.scrollY;
+        let targetScroll = window.scrollY;
+        const ease = 0.07;
+        let smoothScrollActive = false;
+        let animationFrameId;
+
+        function startSmoothScroll() {
+            if (smoothScrollActive) return;
+            smoothScrollActive = true;
+
+            function smoothScroll() {
+                if (!smoothScrollActive) return;
+                const delta = targetScroll - currentScroll;
+                currentScroll += delta * ease;
+                window.scrollTo(0, currentScroll);
+                animationFrameId = requestAnimationFrame(smoothScroll);
+            }
+
+            smoothScroll();
+
+            window.addEventListener('wheel', onWheel, { passive: false });
+
+            addIframeOverlays();
+        }
+
+        function stopSmoothScroll() {
+            if (!smoothScrollActive) return;
+            smoothScrollActive = false;
+            cancelAnimationFrame(animationFrameId);
+            window.removeEventListener('wheel', onWheel, { passive: false });
+            removeIframeOverlays();
+        }
+
+        function onWheel(e) {
+            e.preventDefault();
+            targetScroll += e.deltaY;
+            targetScroll = Math.max(0, Math.min(document.body.scrollHeight - window.innerHeight, targetScroll));
+        }
+
+        let iframeOverlays = [];
+
+        function addIframeOverlays() {
+            removeIframeOverlays();
+            iframeOverlays = [];
+
+            document.querySelectorAll('iframe').forEach(iframe => {
+                const parent = iframe.parentNode;
+                if (getComputedStyle(parent).position === 'static') {
+                    parent.style.position = 'relative';
+                }
+
+                const overlay = document.createElement('div');
+                overlay.style.position = 'absolute';
+                overlay.style.top = '0';
+                overlay.style.left = '0';
+                overlay.style.width = '100%';
+                overlay.style.height = '100%';
+                overlay.style.background = 'transparent';
+                overlay.style.pointerEvents = 'auto';
+                overlay.style.zIndex = '9999';
+
+                overlay.addEventListener('wheel', e => {
+                    e.preventDefault();
+                    targetScroll += e.deltaY;
+                    targetScroll = Math.max(0, Math.min(document.body.scrollHeight - window.innerHeight, targetScroll));
+                }, { passive: false });
+
+                overlay.addEventListener('mousedown', () => {
+                    overlay.style.pointerEvents = 'none';
+                    setTimeout(() => {
+                        overlay.style.pointerEvents = 'auto';
+                    }, 300);
+                });
+
+                parent.insertBefore(overlay, iframe.nextSibling);
+                iframeOverlays.push(overlay);
+            });
+        }
+
+        function removeIframeOverlays() {
+            iframeOverlays.forEach(overlay => overlay.remove());
+            iframeOverlays = [];
+        }
+
+        function shouldHaveSmoothScroll() {
+            return window.location.origin === 'https://cineclubbr.erb.digital/', 'https://cineclubbr.erb.digital/' && window.location.pathname === '/';
+        }
+
+        function updateSmoothScrollState() {
+            if (shouldHaveSmoothScroll()) {
+                startSmoothScroll();
+                console.log('Smooth scroll ATIVADO para', window.location.href);
+            } else {
+                stopSmoothScroll();
+                console.log('Smooth scroll DESATIVADO para', window.location.href);
+            }
+        }
+
+        const pushStateOrig = history.pushState;
+        history.pushState = function (...args) {
+            pushStateOrig.apply(this, args);
+            updateSmoothScrollState();
+        };
+
+        const replaceStateOrig = history.replaceState;
+        history.replaceState = function (...args) {
+            replaceStateOrig.apply(this, args);
+            updateSmoothScrollState();
+        };
+
+        window.addEventListener('popstate', () => {
+            updateSmoothScrollState();
+        });
+
+        updateSmoothScrollState();
+    })();
+
+
+    (function () {
+        function initScroll() {
+            const insertAfter = document.querySelector('.sc-8c4919ca-2.jeQetQ');
+            if (!insertAfter) return console.warn('Elemento alvo não encontrado.');
+
+            // Cria container e conteúdo
+            const container = document.createElement('div');
+            container.className = 'scroll-wrapper';
+            const content = document.createElement('div');
+            content.className = 'scroll-content';
+
+            // Ícones para scroll
+            const items = [
+                { img: 'https://cdn.ereemby.com/attachments/17480518282391154imagem.png' },
+                { img: 'https://cdn.ereemby.com/attachments/17481811748214384imagem.png' },
+                { img: 'https://cdn.ereemby.com/attachments/17482069428346478imagem.png' },
+                { img: 'https://cdn.ereemby.com/attachments/17480518282391154imagem.png' },
+                { img: 'https://cdn.ereemby.com/attachments/17481811748214384imagem.png' },
+                { img: 'https://cdn.ereemby.com/attachments/17482069428346478imagem.png' },
+                { img: 'https://cdn.ereemby.com/attachments/17480518282391154imagem.png' },
+                { img: 'https://cdn.ereemby.com/attachments/17481811748214384imagem.png' },
+                { img: 'https://cdn.ereemby.com/attachments/17482069428346478imagem.png' },
+                { img: 'https://cdn.ereemby.com/attachments/17480518282391154imagem.png' },
+                { img: 'https://cdn.ereemby.com/attachments/17481811748214384imagem.png' },
+                { img: 'https://cdn.ereemby.com/attachments/17482069428346478imagem.png' },
+                { img: 'https://cdn.ereemby.com/attachments/17480518282391154imagem.png' },
+                { img: 'https://cdn.ereemby.com/attachments/17481811748214384imagem.png' },
+                { img: 'https://cdn.ereemby.com/attachments/17482069428346478imagem.png' },
+
+            ];
+
+            function addItems(target) {
+                items.forEach(({ img }) => {
+                    const el = document.createElement('div');
+                    el.className = 'scroll-item';
+                    const image = document.createElement('img');
+                    image.src = img;
+                    image.alt = 'Ícone';
+                    image.className = 'scroll-image';
+                    el.appendChild(image);
+                    target.appendChild(el);
+                });
+            }
+
+            addItems(content);
+            addItems(content);
+
+            container.appendChild(content);
+            insertAfter.insertBefore(container, insertAfter.firstChild);
+
+            // Adiciona estilos, só uma vez
+            if (!document.getElementById('scroll-style')) {
+                const style = document.createElement('style');
+                style.id = 'scroll-style';
+                style.textContent = `
+        .scroll-wrapper {
+          margin: 0; overflow: hidden; max-width: 100%;
+          background: transparent; position: relative; z-index: 0;
+          padding: 15px 0; display: flex; align-items: center;
+        }
+        .scroll-content {
+          display: flex; gap: 150px; will-change: transform;
+        }
+        .scroll-item {
+          flex-shrink: 0; display: flex; flex-direction: column;
+          align-items: center; white-space: nowrap; width: 50px;
+        }
+        .scroll-image {
+          width: 30px; height: auto; display: block;
+        }
+        .scroll-wrapper::before,
+        .scroll-wrapper::after {
+          content: ''; position: absolute; top: 0;
+          width: 80px; height: 100%; z-index: 1; pointer-events: none;
+        }
+        .scroll-wrapper::before {
+          left: 0;
+          background: linear-gradient(to right, rgba(255,255,255,0.05), transparent);
+        }
+        .scroll-wrapper::after {
+          right: 0;
+          background: linear-gradient(to left, rgba(255,255,255,0.05), transparent);
+        }
+      `;
+                document.head.appendChild(style);
+            }
+
+            // Aguarda todas as imagens carregarem
+            function imagesLoaded() {
+                const imgs = Array.from(content.querySelectorAll('img'));
+                return Promise.all(imgs.map(img => new Promise(res => {
+                    if (img.complete) res();
+                    else img.onload = res;
+                    img.onerror = res;
+                })));
+            }
+
+            imagesLoaded().then(() => {
+                let scrollPos = 0;
+                const speed = 0.5;
+
+                const firstGroupWidth = Array.from(content.children)
+                    .slice(0, items.length)
+                    .reduce((acc, el) => acc + el.offsetWidth, 0)
+                    + 150 * (items.length - 1);
+
+                function animate() {
+                    scrollPos -= speed;
+                    if (-scrollPos >= firstGroupWidth) scrollPos = 0;
+                    content.style.transform = `translateX(${scrollPos}px)`;
+                    requestAnimationFrame(animate);
+                }
+                requestAnimationFrame(animate);
+            });
+        }
+
+        // Garante execução no DOM pronto, sem sobrescrever eventos existentes
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initScroll);
+        } else {
+            initScroll();
+        }
+    })();
+
+})();
+
+
+(function () {
+    const imageUrl = '';
+
+    const footerOuter = document.querySelector('.sc-ecfb9615-0.fQVvsf');
+    const footerInner = footerOuter?.querySelector('.sc-ecfb9615-1.fSfbpC');
+    if (!footerOuter || !footerInner) {
+        console.log('Footer não encontrado');
+        return;
+    }
+
+    const footer = document.querySelector('.fSfbpC');
+
+    if (footer) {
+        // Garantir que o footer esteja posicionado para aplicar overlay
+        footer.style.position = 'relative';
+        footer.style.backgroundColor = 'rgba(2, 0, 73, 0.5)';
+        footer.style.borderRadius = '10px';
+
+        // Aplica o blur no fundo atrás do footer
+        footer.style.backdropFilter = 'blur(6px)';
+        footer.style.WebkitBackdropFilter = 'blur(6px)';
+
+        // Aplica borda com gradiente via CSS direto (mais simples)
+        footer.style.border = '1px solid transparent';
+        footer.style.borderImage = 'linear-gradient(to right, transparent, rgb(255, 255, 255), transparent) 1';
+        footer.style.borderImageSlice = '1';
+    }
+
+
+    // Cria imagem de fundo
+    const bgDiv = document.createElement('div');
+    bgDiv.style.width = '100vw';
+    bgDiv.style.height = '250px';
+    bgDiv.style.position = 'absolute';
+    bgDiv.style.bottom = '0';
+    bgDiv.style.left = '0';
+    bgDiv.style.backgroundImage = `url('${imageUrl}')`;
+    bgDiv.style.backgroundRepeat = 'no-repeat';
+    bgDiv.style.backgroundSize = '100% 100%';
+    bgDiv.style.backgroundPosition = 'center bottom';
+    bgDiv.style.pointerEvents = 'none';
+    bgDiv.style.zIndex = '0';
+
+    // Aplica fade nas laterais e na parte de baixo usando máscara composta
+    bgDiv.style.webkitMaskImage = `
+    linear-gradient(to right, transparent, black 15%, black 85%, transparent),
+    linear-gradient(to top, transparent 0%, black 30%)
+  `;
+    bgDiv.style.maskImage = `
+    linear-gradient(to right, transparent, black 15%, black 85%, transparent),
+    linear-gradient(to top, transparent 0%, black 30%)
+  `;
+    bgDiv.style.webkitMaskComposite = 'destination-in';
+    bgDiv.style.maskComposite = 'intersect';
+
+    // Insere dentro do footer
+    footerInner.appendChild(bgDiv);
+
+    console.log('Imagem inserida com fade nas laterais e base para cobrir barra preta');
+})();
+
+
+
+
+
+function adicionarIconeVerificado() {
+    const nome = 'Dominante Cheats';
+
+    const spans = Array.from(document.querySelectorAll('span')).filter(span => {
+        return span.textContent.trim().toLowerCase() === nome.toLowerCase() && !span.querySelector('.verified-badge');
+    });
+
+    spans.forEach(span => {
+        const verifiedBadge = document.createElement('img');
+        verifiedBadge.className = 'verified-badge';
+        verifiedBadge.src = 'https://cdn.ereemby.com/attachments/17488773817005488imagem.png';
+        verifiedBadge.alt = 'Verificado';
+        verifiedBadge.style.cssText = `
+      width: 12px;
+      height: 12px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 4px;
+    `;
+        span.appendChild(verifiedBadge);
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', adicionarIconeVerificado);
+} else {
+    adicionarIconeVerificado();
+}
+
+// Não use MutationObserver por enquanto, para evitar quebras
+
+
+(function () {
+    const features = [
+        {
+            icon: 'https://cdn.ereemby.com/attachments/17489244420578462imagem.png',
+            title: 'Segurança',
+            desc: 'No CineClub, sua segurança vem primeiro. Aqui Protegemos seus dados e oferecemos suporte 24/7.'
+        },
+        {
+            icon: 'https://cdn.ereemby.com/attachments/17489269819793200imagem.png',
+            title: 'O Melhor Custo Benefício',
+            desc: 'Oferecemos filmes novos e clássicos com os melhores preços do mercado. Acesso imediato e sem mensalidade!.'
+        },
+        {
+            icon: 'https://cdn.ereemby.com/attachments/17489951353192240imagem.png',
+            title: 'Qualidade e Atualizações',
+            desc: 'Nosso acervo está sempre em dia com os últimos lançamentos do cinema e plataformas de streaming.'
+        },
+        {
+            icon: 'https://cdn.ereemby.com/attachments/17489958706189026imagem.png',
+            title: 'Suporte Ágil',
+            desc: 'Nosso time está disponível 24/7 para te ajudar com qualquer dúvida.'
+        }
+    ];
+
+    function createContainer() {
+        const container = document.createElement('div');
+        container.className = 'grid-container';
+
+        features.forEach(f => {
+            const box = document.createElement('div');
+            box.className = 'box';
+            box.innerHTML = `
+                <div class="icon"><img src="${f.icon}" alt="${f.title} icon"></div>
+                <div class="title">${f.title}</div>
+                <div class="description">${f.desc}</div>
+            `;
+            container.appendChild(box);
+        });
+
+        return container;
+    }
+
+    function checkAndInsert() {
+        const target = document.querySelector('.sc-46f8ef66-1');
+        const existing = document.querySelector('.grid-container');
+
+        if (target && target.parentNode) {
+            if (!existing) {
+                // Cria e insere
+                const container = createContainer();
+                target.parentNode.insertBefore(container, target);
+            } else if (existing.nextSibling !== target) {
+                // Se já existe mas está no lugar errado, corrige a posição
+                target.parentNode.insertBefore(existing, target);
+            }
+        } else if (document.querySelector('.grid-container')) {
+            // Se o alvo desapareceu, remove o container para evitar lixo no DOM
+            document.querySelector('.grid-container').remove();
+        }
+    }
+
+    // Checa a cada 300ms (pode ajustar o tempo se quiser)
+    setInterval(checkAndInsert, 300);
+})();
+
+
+
+// Remove qualquer vídeo anterior se existir
+const old = document.querySelector('#bg-video');
+if (old) old.remove();
+
+// 1. Injeta o CSS do iframe
+const style = document.createElement('style');
+style.textContent = `
+  .bg-yt-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -999;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .bg-yt-video iframe {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+  }
+`;
+document.head.appendChild(style);
+
+const video = document.createElement('video');
+video.id = 'bg-video';
+video.autoplay = true;
+video.muted = true;
+video.loop = true;
+
+const source = document.createElement('source');
+source.src = 'https://res.cloudinary.com/dw5wf52rx/video/upload/v1749298824/dkyizmr5j1mixsndvzpc.mp4';
+source.type = 'video/mp4';
+
+video.appendChild(source);
+document.body.prepend(video);
+
+
+window.addEventListener('load', () => {
+    // Cria a tela de loading
+    const loadingScreen = document.createElement('div');
+    loadingScreen.id = 'loading-screen';
+
+    // Cria o spinner
+    const spinner = document.createElement('div');
+    spinner.id = 'loading-spinner';
+
+    loadingScreen.appendChild(spinner);
+    document.body.appendChild(loadingScreen);
+
+    // Aguarda 1 segundo depois do carregamento antes de sumir
+    setTimeout(() => {
+        loadingScreen.classList.add('fade-out');
+        // Remove do DOM após a transição de opacidade
+        loadingScreen.addEventListener('transitionend', () => {
+            loadingScreen.remove();
+        });
+    }, 1000);
+});
+
+(function () {
+    const removerPoweredBy = () => {
+        const h1s = document.querySelectorAll('h1');
+        h1s.forEach(h1 => {
+            const texto = h1.textContent.trim().toLowerCase();
+            if (texto === 'powered by ereemby') {
+                h1.remove();
+            }
+        });
+    };
+
+    const observer = new MutationObserver(() => removerPoweredBy());
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    document.addEventListener('DOMContentLoaded', removerPoweredBy);
+})();
+
+function createSidebar() {
+    if (document.querySelector('.custom-sidebar')) return; // Evita duplicar
+
+    const sidebar = document.createElement('div');
+    sidebar.className = 'custom-sidebar';
+    sidebar.innerHTML = `
+    <a class="sidebar-icon" href="https://t.me/cineclub11" target="_blank">
+      <img src="https://cdn.ereemby.com/attachments/17506141733979793imagem.png" alt="Home" />
+    </a>
+    <a class="sidebar-icon" href="https://cineclubbr.erb.digital/terms" target="_blank">
+      <img src="https://cdn.ereemby.com/attachments/1749501894402395imagem.png" alt="Music" />
+    </a>
+  `;
+    document.body.appendChild(sidebar);
+}
+
+function removeSidebar() {
+    const sidebar = document.querySelector('.custom-sidebar');
+    if (sidebar) sidebar.remove();
+}
+
+function handleRouteChange() {
+    if (window.location.pathname === "/") {
+        createSidebar();
+    } else {
+        removeSidebar();
+    }
+}
+
+// Intercepta mudanças de rota via pushState
+const originalPushState = history.pushState;
+history.pushState = function (...args) {
+    originalPushState.apply(this, args);
+    handleRouteChange();
+};
+
+// Também observa navegação com botão Voltar/Avançar
+window.addEventListener('popstate', handleRouteChange);
+
+// Verifica na carga inicial
+handleRouteChange();
+
+
+
+// GLASS TEXT + STATS
+// Função para injetar o bloco se ainda não estiver presente
+function injectGlassContent() {
+    const gridContainer = document.querySelector('.grid-container');
+    if (gridContainer && !document.querySelector('.glass-wrapper')) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'glass-wrapper';
+
+        const statLeft = document.createElement('div');
+        statLeft.className = 'glass-stat';
+        statLeft.innerHTML = `<div class="value">4.8+</div><div class="label">Avaliação Média</div>`;
+
+        const glassText = document.createElement('div');
+        glassText.className = 'glass-text-overlay';
+        glassText.innerHTML = `
+            <div class="glass-main-text">O CineClub Oferece:</div>
+            <div class="glass-subtext">Segurança, Custo Benefício, confiabilidade e suporte 24/7</div>
+        `;
+
+        const statRight = document.createElement('div');
+        statRight.className = 'glass-stat';
+        statRight.innerHTML = `<div class="value">500+</div><div class="label">Clientes Satisfeitos</div>`;
+
+        wrapper.appendChild(statLeft);
+        wrapper.appendChild(glassText);
+        wrapper.appendChild(statRight);
+
+        gridContainer.parentElement.insertBefore(wrapper, gridContainer.nextSibling);
+    }
+}
+
+// Observador de mudanças no DOM
+const observer = new MutationObserver(() => {
+    injectGlassContent();
+});
+
+// Começa a observar o body
+observer.observe(document.body, {
+    childList: true,
+    subtree: true
+});
+
+// Também tenta injetar de imediato, caso o elemento já esteja presente
+injectGlassContent();
+
+
+document.querySelectorAll('.sc-1964b256-2.cdHYuc.blue').forEach(el => el.remove());
+
+
+const target = document.querySelector('.sc-e65bd699-0.gJFCdM');
+
+if (target) {
+    const button = document.createElement('a');
+    button.href = 'https://cineclubbr.erb.digital/category'; // Altere para seu link real
+    button.textContent = '';
+    button.className = 'glass-status-button';
+    button.target = '_blank';
+
+    // Garante que o pai tenha posição relativa
+    target.style.position = 'relative';
+    target.parentElement.style.position = 'relative';
+
+    // Insere o botão antes do target
+    target.parentElement.insertBefore(button, target);
+} 
