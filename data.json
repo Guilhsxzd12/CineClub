@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Filme Exemplo 1",
+    "desc": "Descrição curtinha do Filme 1.",
+    "img": "https://via.placeholder.com/300x450?text=Filme+1",
+    "link": "https://drive.google.com/galeria1"
+  },
+  {
+    "title": "Filme Exemplo 2",
+    "desc": "Descrição curtinha do Filme 2.",
+    "img": "https://via.placeholder.com/300x450?text=Filme+2",
+    "link": "https://drive.google.com/galeria2"
+  },
+  {
+    "title": "Filme Exemplo 3",
+    "desc": "Descrição curtinha do Filme 3.",
+    "img": "https://via.placeholder.com/300x450?text=Filme+3",
+    "link": "https://drive.google.com/galeria3"
+  }
+]
